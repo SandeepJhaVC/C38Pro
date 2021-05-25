@@ -26,13 +26,14 @@ function setup() {
   monkey.addAnimation("running", monkey_running);
   monkey.addImage("collided",collided);
   monkey.scale=0.1;
+  monkey.velocityX += 5;
 
   bg = createSprite(200,180,400,20);
   bg.addImage("ground",bgImage);
   bg.x = bg.width/2;
-  bg.velocityX = -3;
+  //bg.velocityX = -3;
   
-  ground = createSprite(350,405,700,10);
+  ground = createSprite(500,405,1000,0);
   ground.visible = false;
     
   stoneGroup = new Group();
@@ -44,12 +45,14 @@ function setup() {
   textStyle("bold");
 }
 
-function draw() {console.log(monkey.y);
+function draw() {
   background(220);
   
   monkey.depth = monkey.depth + 1;
   monkey.collide(ground);
   monkey.velocityY += 0.75;
+
+  ground.width += 10;
   
   if(state===play){
     
