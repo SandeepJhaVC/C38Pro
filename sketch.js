@@ -2,7 +2,7 @@ var monkey, monkeyrunning,collided;
 var bg, ground, bgImage;
 var bananaimg, stoneimg, bananaGroup, stoneGroup;
 var count;
-var stop, state, play, first, second, chance;
+var stop, state, play, FIRST = 1, SECOND =2, chance;
 
 function preload(){
   monkey_running = loadAnimation("Monkey_01.png","Monkey_02.png","Monkey_03.png","Monkey_04.png","Monkey_05.png","Monkey_06.png","Monkey_07.png","Monkey_08.png","Monkey_09.png","Monkey_10.png");
@@ -15,17 +15,17 @@ function preload(){
 }
 
 function setup() {
-  createCanvas(1000, 500);
+  createCanvas(displayWidth,displayHeight);
   
   state = play;
-  chance = first;
+  chance = FIRST;
   
   count=0;
   
-  monkey = createSprite(50,350);
+  monkey = createSprite(100,350);
   monkey.addAnimation("running", monkey_running);
   monkey.addImage("collided",collided);
-  monkey.scale=0.1;
+  monkey.scale=0.2;
   monkey.velocityX += 5;
 
   //bg = createSprite(200,180,400,20);
@@ -33,7 +33,7 @@ function setup() {
   //bg.x = bg.width/2;
   //bg.velocityX = -3;
   
-  ground = createSprite(500,405,1000,0);
+  ground = createSprite(displayWidth/2,height-200,displayWidth,10);
   ground.visible = false;
     
   stoneGroup = new Group();
@@ -45,18 +45,18 @@ function setup() {
   textStyle("bold");
 }
 
-function draw() {
+function draw() {console.log(monkey.y);
   background(bgImage);
   
   monkey.depth = monkey.depth + 1;
   monkey.collide(ground);
-  monkey.velocityY += 0.75;
+  monkey.velocityY += 0.5;
 
   ground.width += 10;
   
   if(state===play){
     
-    if(keyDown("space") & monkey.y > 300) {
+    if(keyDown("space") & monkey.y > 700) {
       monkey.velocityY = -15;
     }
   
@@ -76,33 +76,40 @@ function draw() {
       bananaGroup.get(i).destroy();
       count += 2;
       monkey.scale += 0.025;
-      chance = second;
+      //chance = SECOND;
     }
   }
  
-  for(var i = 0; i < stoneGroup.length; i++){
-    if(stoneGroup.get(i).isTouching(monkey) && count >=1){
+  /*for(var i = 0; i < stoneGroup.length; i++){
+    if(stoneGroup.get(i).isTouching(monkey) && chance >= SECOND){
       count -= 1;
-      monkey.scale = 0.1;
+      monkey.scale = 0.2;
+      chance = FIRST
+    }
+  }*/
+  
+  for(var i = 0; i < stoneGroup.length; i++){
+    if(stoneGroup.get(i).isTouching(monkey) && chance === FIRST){
+      //count -= 1;
+      //monkey.scale = 0.2;
+      state = stop;
     }
   }
   
-  for(var i = 0; i < stoneGroup.length; i++){
-    if(stoneGroup.get(i).isTouching(monkey) && count < 0 && chance === second){
-      state = stop;
-    }
-  }
+  
     
-    for(var i = 0; i < stoneGroup.length; i++){
-    if(stoneGroup.get(i).isTouching(monkey) && count === 0 && chance === first){
+    /*for(var i = 0; i < stoneGroup.length; i++){
+    if(stoneGroup.get(i).isTouching(monkey) && count === 0 && chance === FIRST){
       state = stop;
+      chance = SECOND;
     }
-  }
+  }*/
     
 }
   
   if(state === stop){
     monkey.changeImage("collided",collided);
+    monkey.velocityX = 0;
     
     //bg.velocityX = 0;
     
@@ -111,6 +118,11 @@ function draw() {
     
     bananaGroup.setLifetimeEach(-1);
     stoneGroup.setLifetimeEach(-1);
+
+    push();
+    textSize(100);
+    text("Game Over",camera.position.x,displayHeight/2);
+    pop();
   }
   
   drawSprites();
@@ -120,11 +132,11 @@ function draw() {
 
 function spawnStones() {
   if(frameCount % 100 === 0) {
-    var stone = createSprite(camera.position.x + 1000,375);
+    var stone = createSprite(camera.position.x + 1000,height-250);
     stone.addImage("obstacle",stoneimg);
-    stone.velocityX = -4.5;          
-    stone.lifetime = 180;
-    stone.scale=0.15;
+    stone.velocityX = -4;          
+    stone.lifetime = 250;
+    stone.scale=0.3;
     stone.setCollider("circle",-20,20,220);
     stoneGroup.add(stone);
   }
@@ -134,11 +146,11 @@ function spawnBananas() {
   //write code here to spawn the clouds
   if (frameCount % 90 === 0) {
     var banana = createSprite(camera.position.x+1000);
-    banana.y = Math.round(random(150,250));
+    banana.y = Math.round(random(height-500,height-300));
     banana.addImage("food",bananaimg);
     banana.velocityX = -5;
-    banana.lifetime = 150;
-    banana.scale=0.09;
+    banana.lifetime = 200;
+    banana.scale=0.1;
     banana.setCollider("rectangle",0,0,1000,500);
     bananaGroup.add(banana);
   }
